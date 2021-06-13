@@ -231,7 +231,7 @@ man_pages = [
 texinfo_documents = [
     ('index', 'Garbage_Classification', u'Garbage_Classification Documentation',
      u"Chrysostomos Papadopoulos, Konstantinos Spyrikos", 'Garbage_Classification',
-     'The final project for DTU's Special Course: Machine Learning Operations', 'Miscellaneous'),
+     "The final project for DTU's Special Course: Machine Learning Operations", 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
