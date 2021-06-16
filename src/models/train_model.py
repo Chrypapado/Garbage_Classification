@@ -14,6 +14,8 @@ project_dir = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_dir / 'src/data'))
 from make_dataset import main as dataset
 
+
+
 class TrainOREvaluate(object):
     """ Helper class that will help launch class methods as commands
         from a single script
@@ -21,63 +23,74 @@ class TrainOREvaluate(object):
     def __init__(self):
         parser = argparse.ArgumentParser(
             description="Script for either training or evaluating",
-            usage="python main.py <command>"
+            usage="python train_model.py <command>"
         )
         parser.add_argument("command", help="Subcommand to run")
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
             print('Unrecognized command')
-            
             parser.print_help()
             exit(1)
-        # use dispatch pattern to invoke method with same name
+        #Use dispatch pattern to invoke method with same name
         getattr(self, args.command)()
     
     def train(self):
         print("Training day and night")
         parser = argparse.ArgumentParser(description='Training arguments')
         parser.add_argument('--lr', default=0.1)
-        # add any additional argument that you want
+        #Add any additional argument that you want
         args = parser.parse_args(sys.argv[2:])
         print(args)
-        
-        # TODO: Implement training loop here
+        #Write Files
+        filepath = str(project_dir.joinpath('reports'))
+        fpTL_batch = open(filepath + "/Train_Loss_Batch" , "w")
+        fpTL_epoch = open(filepath + "/Train_Loss_Epoch" , "w")
+        #Training loop
+        #device =torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        #print(device)
         model = MyAwesomeModel()
         criterion = nn.NLLLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         train_set, test_set, val_set = dataset()
-        epochs = 20
-        steps = 0
+        epochs = 5
+        #steps = 0
         train_losses = []
         epoch_losses = []
-        epoch_loss = 0
-        for e in range(epochs):
-            running_loss = 0
-            for images, labels in train_set:
-                log_ps = model(images)
-                loss = criterion(log_ps, labels)
+        for epoch in range(epochs):
+            print("At epoch: ", epoch)
+            epoch_loss = 0
+            #num_batches = train_set.__len__()
+            #running_loss = 0
+            for (i, (images, labels)) in enumerate(train_set):
+                #images, labels = images.to(device), labels.to(device)
                 optimizer.zero_grad()
+                outputs = model(images)
+                loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
-                running_loss += loss.item()
-                steps += 1
+                #steps += 1
                 train_losses.append(loss.item()/64)
                 epoch_loss += loss.item()
-            print(f"Training loss: {running_loss/len(train_set)}")
+                #print('\rProcessing batch %04d out of %04d, running loss %04f' % (i, num_batches, loss))
+            print(f"Training loss: {epoch_loss/len(train_set)}")
             epoch_losses += [epoch_loss]
             epoch_loss = 0
-           
+            #torch.save(model.state_dict(), project_dir.joinpath('models/model.pth' + '_' + str(epoch+1)))
+        fpTL_batch.write(str(train_losses) + ',')
+        fpTL_batch.flush()
+        fpTL_epoch.write(str(epoch_losses) + ',')
+        fpTL_epoch.flush()
         torch.save(model.state_dict(), project_dir.joinpath('models/model.pth'))
 
         # Plot resulting training losses
-        fig, ax = plt.subplots(1, 2, figsize=(10,4))
-        ax[0].plot(np.arange(1, steps+1), train_losses, label='Training Losses (per batch)')
-        ax[1].plot(np.arange(1, len(epoch_losses)+1), epoch_losses, label='Training Losses (per epoch)', color="#F58A00")
-        ax[0].legend()
-        ax[1].legend()
-        plt.tight_layout()
-        image_path = str(project_dir / 'reports/figures/Training_loss.png')
-        plt.savefig(image_path)
+        #fig, ax = plt.subplots(1, 2, figsize=(10,4))
+        #ax[0].plot(np.arange(1, steps+1), train_losses, label='Training Losses (per batch)')
+        #ax[1].plot(np.arange(1, len(epoch_losses)+1), epoch_losses, label='Training Losses (per epoch)', color="#F58A00")
+        #ax[0].legend()
+        #ax[1].legend()
+        #plt.tight_layout()
+        #image_path = str(project_dir / 'reports/figures/Training_loss.png')
+        #plt.savefig(image_path)
         
     def evaluate(self):
         print("Evaluating until hitting the ceiling")

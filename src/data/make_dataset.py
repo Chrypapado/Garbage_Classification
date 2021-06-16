@@ -143,7 +143,7 @@ def main():
             data_t: torch.Tensor = kornia.image_to_tensor(data, keepdim=False)
             data_t = kornia.bgr_to_rgb(data_t)
             data_t = kornia.normalize(data_t, 0., 255.)
-            img, labels = data_t[..., :int(data_t.shape[-1]/2)], data_t[..., int(data_t.shape[-1]/2):]
+            img, labels = data_t[..., :int(data_t.shape[-1])], data_t[..., int(data_t.shape[-1]/2):]
             return img, labels
         for i in range(len(augment)):
             img, labels = load_data(str(project_dir.joinpath('./data/processed/Train/' + augment[i])))
