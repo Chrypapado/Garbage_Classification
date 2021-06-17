@@ -1,27 +1,45 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
+import torchvision.models as models
 
-class MyAwesomeModel(nn.Module):
+def accuracy(outputs, labels):
+    _, preds = torch.max(outputs, dim=1)
+    return torch.tensor(torch.sum(preds == labels).item() / len(preds))
+
+class ImageClassificationBase(nn.Module):
+    def training_step(self, batch):
+        images, labels = batch 
+        out = self(images)                  
+        loss = F.cross_entropy(out, labels) 
+        return loss
+    
+    def validation_step(self, batch):
+        images, labels = batch 
+        out = self(images)                    
+        loss = F.cross_entropy(out, labels)   
+        acc = accuracy(out, labels)           
+        return {'val_loss': loss.detach(), 'val_acc': acc}
+        
+    def validation_epoch_end(self, outputs):
+        batch_losses = [x['val_loss'] for x in outputs]
+        epoch_loss = torch.stack(batch_losses).mean()   
+        batch_accs = [x['val_acc'] for x in outputs]
+        epoch_acc = torch.stack(batch_accs).mean()      
+        return {'val_loss': epoch_loss.item(), 'val_acc': epoch_acc.item()}
+    
+    def epoch_end(self, epoch, result):
+        print("Epoch {}: train_loss: {:.4f}, val_loss: {:.4f}, val_acc: {:.4f}".format(
+            epoch+1, result['train_loss'], result['val_loss'], result['val_acc']))
+
+class ResNet(ImageClassificationBase):
     def __init__(self):
         super().__init__()
+        #Pretrained Model
+        self.network = models.resnet50(pretrained=True)
+        num_ftrs = self.network.fc.in_features
+        self.network.fc = nn.Linear(num_ftrs, 6)
+        #self.network.fc = nn.Linear(num_ftrs, len(train_set.classes))
 
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=5, kernel_size=5)
-        self.conv2 = nn.Conv2d(in_channels=5, out_channels=5, kernel_size=5)
-        self.fc1 = nn.Linear(in_features=5*40*55, out_features=1000)
-        self.fc2 = nn.Linear(in_features=1000, out_features=100)
-        self.fc3 = nn.Linear(in_features=100, out_features=6)
-
-        self.maxpool = nn.MaxPool2d(3, 3)
-        self.leakyrelu = nn.LeakyReLU()
-        self.dropout = nn.Dropout(p=0.1)        
-
-    def forward(self, x):
-        x = self.maxpool(self.leakyrelu(self.conv1(x)))
-        x = self.maxpool(self.leakyrelu(self.conv2(x)))
-        x = x.view(-1, 5*40*55)
-        x = self.dropout(self.leakyrelu(self.fc1(x)))
-        x = self.dropout(self.leakyrelu(self.fc2(x)))
-        x = F.log_softmax(self.fc3(x),dim=1)
-        return x
-
+    def forward(self, xb):
+        return torch.sigmoid(self.network(xb))
