@@ -24,13 +24,17 @@ if __name__ == '__main__':
     print(device)
     model = ResNet()
     model.to(device)
-    dict_ = torch.load(model_path)
+    if torch.cuda.is_available():
+        dict_ = torch.load(model_path)
+    else:
+        dict_ = torch.load(model_path, map_location='cpu')
     model.load_state_dict(dict_)
     # Image Settings
     image = Image.open(str(project_dir.joinpath('./data/external'))+ '/' + args.image)
     transformations = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
     edit_image = transformations(image)
     plt.imshow(edit_image.permute(1, 2, 0))
+    plt.show()
     unsqueezed_image = edit_image.unsqueeze(0)
     device_image = unsqueezed_image.to(device, non_blocking=True)
     modeled_image = model(device_image)
