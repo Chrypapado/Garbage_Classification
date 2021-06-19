@@ -1,0 +1,29 @@
+name: "Linting and Flaking"
+
+on:
+  push:
+    branches: [ add-tests-folder ]
+  pull_request:
+    branches: [ add-tests-folder ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up Python 3.7.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7.6
+    - name: Sort packages
+      run: |
+        pip install isort
+        isort src/*
+
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        flake8 src/*

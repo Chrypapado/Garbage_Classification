@@ -45,6 +45,8 @@ class TrainOREvaluate(object):
         model = ResNet()
         model.to(device)
         wandb.watch(model, log_freq=100)
+        classes = ['Glass', 'Paper',  'Cardboard',
+                   'Plastic',  'Metal',  'Trash']
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
         train_dl = DataLoader(train_set, args.batch_size,
@@ -78,7 +80,8 @@ class TrainOREvaluate(object):
                     outputs = model(images)
                     val_loss = criterion(outputs, labels)
                     _, preds = torch.max(outputs, dim=1)
-                    val_acc = torch.tensor(torch.sum(preds == labels).item() / len(preds))
+                    val_acc = torch.tensor(
+                        torch.sum(preds == labels).item() / len(preds))
                     wandb.log({"Validation Accuracy": val_acc})
                     wandb.log({"Validation Loss": val_loss})
                     ps = torch.exp(outputs)
@@ -88,7 +91,7 @@ class TrainOREvaluate(object):
                     counter += 1
                     accuracy += torch.mean(equals.type(torch.FloatTensor))
 
-                    for label, prediction in zip(batch[1], predictions):
+                    for label, prediction in zip(labels, predictions):
                         if label == prediction:
                             correct_pred_list[label][0] += 1
                         # correct_pred[classes[label]] += 1
@@ -112,6 +115,7 @@ class TrainOREvaluate(object):
 
             torch.save(model.state_dict(),
                        project_dir.joinpath('models/model' + str(epoch) + '.pth'))
+        wandb.finish()
 
     def evaluate(self):
         print("Evaluating until hitting the ceiling")
