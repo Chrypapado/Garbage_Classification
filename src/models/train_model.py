@@ -11,9 +11,6 @@ sys.path.insert(0, str(project_dir / 'src/data'))
 from make_dataset import main as dataset
 
 class TrainOREvaluate(object):
-    """ Helper class that will help launch class methods as commands
-        from a single script
-    """
     def __init__(self):
         parser = argparse.ArgumentParser(
             description="Script for either training or evaluating",
@@ -58,7 +55,6 @@ class TrainOREvaluate(object):
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
-            
             accuracy = 0
             counter = 0
             with torch.no_grad():

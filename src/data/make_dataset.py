@@ -15,10 +15,17 @@ from torch import nn
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
 
+#import azureml.core
+#from azureml.core import Workspace
+
 def main():
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
+    # Load the workspace from the saved config file
+    #ws = Workspace.from_config()
+    #print('Ready to use Azure ML {} to work with {}'.format(azureml.core.VERSION, ws.name))
+
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 

@@ -76,7 +76,19 @@ target/
 .ipynb_checkpoints/
 
 # exclude data from source control by default
-/data/
+/data/processed/
+/data/raw/
+
+/models/model1.pth
+/models/model2.pth
+/models/model3.pth
+/models/model4.pth
+/models/model5.pth
+/models/model6.pth
+/models/model7.pth
+/models/model8.pth
+/models/model9.pth
+
 
 # Mac OS-specific storage files
 .DS_Store
