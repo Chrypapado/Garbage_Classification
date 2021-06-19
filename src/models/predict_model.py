@@ -24,7 +24,7 @@ if __name__ == '__main__':
     print(device)
     model = ResNet()
     model.to(device)
-    dict_ = torch.load(model_path)
+    dict_ = torch.load(model_path, map_location = 'cpu')
     model.load_state_dict(dict_)
     # Image Settings
     image = Image.open(str(project_dir.joinpath('./data/external'))+ '/' + args.image)
