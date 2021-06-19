@@ -1,4 +1,4 @@
-#Import Libraries and Modules
+# Import Libraries and Modules
 import sys
 import argparse
 from pathlib import Path
@@ -9,6 +9,9 @@ from model import ResNet
 project_dir = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_dir / 'src/data'))
 from make_dataset import main as dataset
+import wandb
+wandb.login()
+
 
 class TrainOREvaluate(object):
     def __init__(self):
@@ -33,25 +36,33 @@ class TrainOREvaluate(object):
         parser.add_argument('--num_epochs', type=int, default=10)
         args = parser.parse_args(sys.argv[2:])
         print(args)
+        wandb.init(project='testing', config=args)
         # Load Data
         train_set, test_set, val_set = dataset()
-        # Set Device and Model Configurations 
+        # Set Device and Model Configurations
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(device)
         model = ResNet()
         model.to(device)
+        wandb.watch(model, log_freq=100)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-        train_dl = DataLoader(train_set, args.batch_size, shuffle = True, num_workers = 4, pin_memory = True)
-        val_dl = DataLoader(val_set, args.batch_size * 2, num_workers = 4, pin_memory = True)
+        train_dl = DataLoader(train_set, args.batch_size,
+                              shuffle=True, num_workers=4, pin_memory=True)
+        val_dl = DataLoader(val_set, args.batch_size * 2,
+                            num_workers=4, pin_memory=True)
         # Training
         for epoch in range(args.num_epochs):
-            print('Epoch '+ str(epoch + 1))
+            print('Epoch ' + str(epoch + 1))
             model.train()
+            class_acc = {}
+            correct_pred_list = [[0] for _ in range(6)]
+            total_pred_list = [[0] for _ in range(6)]
             for images, labels in train_dl:
                 images, labels = images.to(device), labels.to(device)
                 output = model(images)
                 loss = criterion(output, labels)
+                wandb.log({"Training Loss": loss})
                 loss.backward()
                 optimizer.step()
                 optimizer.zero_grad()
@@ -60,15 +71,41 @@ class TrainOREvaluate(object):
             with torch.no_grad():
                 model.eval()
                 for images, labels in val_dl:
+                    val = model.validation_step(batch)
+                    wandb.log({"Validation Accuracy": val['val_acc']})
+                    wandb.log({"Validation Loss": val['val_loss']})
                     images, labels = images.to(device), labels.to(device)
-                    ps = torch.exp(model(images))
+                    outputs = model(images)
+                    ps = torch.exp(outputs)
                     top_p, top_class = ps.topk(1, dim=1)
                     equals = top_class == labels.view(*top_class.shape)
+                    _, predictions = torch.max(outputs, 1)
                     counter += 1
                     accuracy += torch.mean(equals.type(torch.FloatTensor))
+
+                    for label, prediction in zip(batch[1], predictions):
+                        if label == prediction:
+                            correct_pred_list[label][0] += 1
+                        # correct_pred[classes[label]] += 1
+                        total_pred_list[label][0] += 1
+
                 accuracy = accuracy / counter
-                print('Accuracy: ' + str(accuracy*100) + '%')
-            torch.save(model.state_dict(), 
+                print('Accuracy: ' + str(accuracy * 100) + '%')
+            for i in range(len(classes)):
+
+                if total_pred_list[i][0] != 0:
+                    print('Accuracy of %5s : %2d %%' %
+                          (classes[i], 100 * correct_pred_list[i][0] / total_pred_list[i][0]))
+                    class_acc["Accuracy of %5s" %
+                              (classes[i])] = 100 * correct_pred_list[i][0] / total_pred_list[i][0]
+                else:
+                    print('Accuracy of %5s : %2d %%' %
+                          (classes[i], 100 * correct_pred_list[i][0] / 1))
+                    class_acc["Accuracy of %5s" %
+                              (classes[i])] = 100 * correct_pred_list[i][0] / 1
+            wandb.log(class_acc)
+
+            torch.save(model.state_dict(),
                        project_dir.joinpath('models/model' + str(epoch) + '.pth'))
 
     def evaluate(self):
@@ -80,15 +117,17 @@ class TrainOREvaluate(object):
         args = parser.parse_args(sys.argv[2:])
         print(args)
         # Load Model
-        model_path = str(project_dir.joinpath('./models')) + '/' + args.load_model_from + '.pth'
+        model_path = str(project_dir.joinpath('./models')) + \
+            '/' + args.load_model_from + '.pth'
         # Load Data
         train_set, test_set, val_set = dataset()
-        # Set Device and Model Configurations 
+        # Set Device and Model Configurations
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(device)
         model = ResNet()
         model.to(device)
-        test_dl = DataLoader(test_set, args.batch_size*2, num_workers = 4, pin_memory = True)
+        test_dl = DataLoader(test_set, args.batch_size * 2,
+                             num_workers=4, pin_memory=True)
         print(device)
         dict_ = torch.load(model_path)
         model.load_state_dict(dict_)
@@ -96,7 +135,7 @@ class TrainOREvaluate(object):
         counter = 0
         with torch.no_grad():
             model.eval()
-            for images, labels in test_dl: 
+            for images, labels in test_dl:
                 images, labels = images.to(device), labels.to(device)
                 ps = torch.exp(model(images))
                 top_p, top_class = ps.topk(1, dim=1)
@@ -105,6 +144,7 @@ class TrainOREvaluate(object):
                 accuracy += torch.mean(equals.type(torch.FloatTensor))
             accuracy = accuracy / counter
             print(f'Accuracy: {accuracy.item()*100}%')
+
 
 if __name__ == '__main__':
     TrainOREvaluate()
