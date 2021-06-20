@@ -99,3 +99,6 @@ target/
 
 # Mypy cache
 .mypy_cache/
+
+# Data
+/FashionMNIST/
