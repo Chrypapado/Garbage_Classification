@@ -1,0 +1,28 @@
+{
+    "os": "Windows-10-10.0.18362-SP0",
+    "python": "3.7.6",
+    "heartbeatAt": "2021-06-19T22:36:30.561449",
+    "startedAt": "2021-06-19T22:36:27.619139",
+    "docker": null,
+    "gpu": "NVIDIA GeForce GTX 1050",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [
+        "train",
+        "--num_epochs",
+        "2"
+    ],
+    "state": "running",
+    "program": "C:\\Users\\kspyr\\Desktop\\GitHub\\Garbage_Classification\\src\\models\\train_model.py",
+    "codePath": "src\\models\\train_model.py",
+    "git": {
+        "remote": "https://github.com/Chrypapado/Garbage_Classification.git",
+        "commit": "6d98d45da2f26a55d2a9626b593b285592a0fb52"
+    },
+    "email": "kspyrikos@gmaIl.com",
+    "root": "C:/Users/kspyr/Desktop/GitHub/Garbage_Classification",
+    "host": "Kspyr",
+    "username": "kspyr",
+    "executable": "C:\\Users\\kspyr\\anaconda3\\python.exe"
+}

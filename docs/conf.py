@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#
+extensions = []
 # Garbage_Classification documentation build configuration file, created by
 # sphinx-quickstart.
 #
@@ -10,9 +10,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
-import os
-import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -26,7 +23,6 @@ import sys
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -231,7 +227,8 @@ man_pages = [
 texinfo_documents = [
     ('index', 'Garbage_Classification', u'Garbage_Classification Documentation',
      u"Chrysostomos Papadopoulos, Konstantinos Spyrikos", 'Garbage_Classification',
-     "The final project for DTU's Special Course: Machine Learning Operations", 'Miscellaneous'),
+     "The final project for DTU's Special Course: \
+     Machine Learning Operations", 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
