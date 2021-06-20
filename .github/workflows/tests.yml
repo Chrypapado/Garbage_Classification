@@ -2,9 +2,9 @@ name: "Run tests"
 
 on:
   push:
-    branches: [ add-tests-folder ]
+    branches: [ wandb-ci ]
   pull_request:
-    branches: [ add-tests-folder ]
+    branches: [ wandb-ci ]
 
 jobs:
   build:
