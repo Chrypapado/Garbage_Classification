@@ -1,15 +1,18 @@
 # Import Libraries and Modules
-import sys
 import argparse
+import sys
 from pathlib import Path
+
 import torch
 import torch.nn as nn
-from torch.utils.data.dataloader import DataLoader
 from model import ResNet
+from torch.utils.data.dataloader import DataLoader
+
 project_dir = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_dir / 'src/data'))
-from make_dataset import main as dataset
-import wandb
+import wandb  # noqa: E402
+from make_dataset import main as dataset  # noqa: E402
+
 wandb.login()
 
 
@@ -45,8 +48,8 @@ class TrainOREvaluate(object):
         model = ResNet()
         model.to(device)
         wandb.watch(model, log_freq=100)
-        classes = ['Glass', 'Paper',  'Cardboard',
-                   'Plastic',  'Metal',  'Trash']
+        classes = ['Glass', 'Paper', 'Cardboard',
+                   'Plastic', 'Metal', 'Trash']
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
         train_dl = DataLoader(train_set, args.batch_size,
@@ -73,9 +76,9 @@ class TrainOREvaluate(object):
             with torch.no_grad():
                 model.eval()
                 for images, labels in val_dl:
-                    #val = model.validation_step(batch)
-                    #wandb.log({"Validation Accuracy": val['val_acc']})
-                    #wandb.log({"Validation Loss": val['val_loss']})
+                    # val = model.validation_step(batch)
+                    # wandb.log({"Validation Accuracy": val['val_acc']})
+                    # wandb.log({"Validation Loss": val['val_loss']})
                     images, labels = images.to(device), labels.to(device)
                     outputs = model(images)
                     val_loss = criterion(outputs, labels)

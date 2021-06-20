@@ -1,13 +1,12 @@
 import argparse
 import sys
-from PIL import Image
 from pathlib import Path
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 import torch
 import torchvision.transforms as transforms
-
 from model import ResNet
+from PIL import Image
 
 if __name__ == '__main__':
     # Arguments
@@ -40,6 +39,6 @@ if __name__ == '__main__':
     modeled_image = model(device_image)
     prob, preds = torch.max(modeled_image, dim=1)
     # Prediction
-    classes = ['Glass', 'Paper', 'Cardboard', 'Plastic', 'Metal',  'Trash']
+    classes = ['Glass', 'Paper', 'Cardboard', 'Plastic', 'Metal', 'Trash']
     classes[preds[0].item()]
     print("Predicted image: ", classes[preds[0].item()])

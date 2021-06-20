@@ -1,12 +1,12 @@
 import torch
-from torch import nn
-import torch.nn.functional as F
 import torchvision.models as models
+from torch import nn
+
 
 class ResNet(nn.Module):
     def __init__(self):
         super().__init__()
-        #Pretrained Model
+        # Pretrained Model
         self.network = models.resnet50(pretrained=True)
         num_ftrs = self.network.fc.in_features
         self.network.fc = nn.Linear(num_ftrs, 6)
