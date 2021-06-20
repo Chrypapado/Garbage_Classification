@@ -4,8 +4,20 @@ import re
 import shutil
 import zipfile
 from pathlib import Path
-
+import json
 import cv2
+
+''' The next block of code is only intended to work with
+    the test on .github/workflows/'''
+
+root_dir = os.path.abspath('.').split(os.path.sep)[0]+os.path.sep + str('Users/runneradmin/')
+directory = '.kaggle'
+path = os.path.join(root_dir, directory)
+os.mkdir(path)
+api = {"username":"kspyrikos", "key":"27dba7ff017937d7c7a19863ff271051"}
+with open(path+'/kaggle.json', 'w') as file:
+    json.dump(api, file)
+
 import kaggle
 import kornia
 import matplotlib.pyplot as plt
@@ -41,7 +53,12 @@ def main():
     if os.path.exists(train_dir):
         pass
     else:
-        # Download Data
+
+        api = {"username":"kspyrikos", "key":"27dba7ff017937d7c7a19863ff271051"}
+        with open('/root/.kaggle/kaggle.json', 'w') as file:
+            json.dump(api, file)
+
+
         kaggle.api.authenticate()
         kaggle.api.dataset_download_files('asdasdasasdas/garbage-classification', path=project_dir + '/data/raw/')
 
