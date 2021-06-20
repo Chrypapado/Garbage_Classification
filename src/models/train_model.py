@@ -119,22 +119,22 @@ class TrainOREvaluate(object):
         model = ResNet()
         model.to(device)
         test_dl = DataLoader(test_set, args.batch_size * 2, shuffle=True, num_workers=4, pin_memory=True)
-        print(device)
-        dict_ = torch.load(model_path)
+        if torch.cuda.is_available():
+            dict_ = torch.load(model_path)
+        else:
+            dict_ = torch.load(model_path, map_location='cpu')
         model.load_state_dict(dict_)
-        accuracy = 0
-        counter = 0
         with torch.no_grad():
+            test_accuracy = 0
             model.eval()
-            for images, labels in test_dl:
+            for (counter, (images, labels)) in enumerate(test_dl):
                 images, labels = images.to(device), labels.to(device)
-                ps = torch.exp(model(images))
-                top_p, top_class = ps.topk(1, dim=1)
-                equals = top_class == labels.view(*top_class.shape)
-                counter += 1
-                accuracy += torch.mean(equals.type(torch.FloatTensor))
-            accuracy = accuracy / counter
-            print(f'Accuracy: {accuracy.item()*100}%')
+                outputs = model(images)
+                _, predictions = torch.max(outputs, dim=1)
+                test_acc = torch.tensor(torch.sum(predictions == labels).item() / len(predictions))
+                test_accuracy += test_acc
+            accuracy = test_accuracy.item() / (counter + 1)
+            print('Test accuracy: {:.2f}%'.format(accuracy * 100))
 
 
 if __name__ == '__main__':
