@@ -1,22 +1,22 @@
-#Import Libraries and Modules
-import sys
+# Import Libraries and Modules
 import argparse
+import sys
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.manifold import TSNE
-
 import torch
 import torch.nn as nn
+from sklearn.manifold import TSNE
 from torch.utils.data.dataloader import DataLoader
 
 project_dir = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_dir / 'src/data'))
-from make_dataset import main as dataset
+from make_dataset import main as dataset  # noqa: E402
+
 sys.path.insert(0, str(project_dir / 'src/models'))
-from model import ResNet
+from model import ResNet  # noqa: E402
 
 if __name__ == '__main__':
     # Arguments
@@ -29,8 +29,8 @@ if __name__ == '__main__':
     model_path = str(project_dir.joinpath('./models')) + '/' + args.load_model_from + '.pth'
     # Load Data
     train_set, test_set, val_set = dataset()
-    val_dl = DataLoader(val_set, args.batch_size, num_workers = 4, pin_memory = True, shuffle = True)    
-    # Set Device and Model Configurations 
+    val_dl = DataLoader(val_set, args.batch_size, num_workers=4, pin_memory=True, shuffle=True)
+    # Set Device and Model Configurations
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(device)
     model = ResNet()
@@ -47,7 +47,8 @@ if __name__ == '__main__':
         break
     features_5 = features_4.detach().squeeze().cpu().numpy()
     embedded = TSNE(n_components=2).fit_transform(features_5)
-    classes = pd.Series(list(labels.cpu().numpy())).map({0:'Glass', 1:'Paper', 2:'Cardboard', 3:'Plastic', 4:'Metal', 5:'Trash'})
+    classes = pd.Series(list(labels.cpu().numpy()))\
+        .map({0: 'Glass', 1: 'Paper', 2: 'Cardboard', 3: 'Plastic', 4: 'Metal', 5: 'Trash'})
     data = pd.DataFrame({'x': embedded[:, 0], 'y': embedded[:, 1], 'label': classes})
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.scatterplot(data=data, x='x', y='y', hue='label', ax=ax, palette="Set1")
