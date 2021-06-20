@@ -1,0 +1,26 @@
+{
+    "os": "Linux-5.4.0-1047-azure-x86_64-with-glibc2.10",
+    "python": "3.8.1",
+    "heartbeatAt": "2021-06-20T10:23:35.998980",
+    "startedAt": "2021-06-20T10:23:32.415209",
+    "docker": null,
+    "gpu": "NVIDIA Tesla K80",
+    "gpu_count": 1,
+    "cpu_count": 6,
+    "cuda": "10.1.243",
+    "args": [
+        "train"
+    ],
+    "state": "running",
+    "program": "train.py",
+    "codePath": "src/models/train.py",
+    "git": {
+        "remote": "https://github.com/Chrypapado/Garbage_Classification.git",
+        "commit": "e3b1795899d4943cdf3320dc2694389390abd052"
+    },
+    "email": "chrypapadopoulos@gmail.com",
+    "root": "/mnt/batch/tasks/shared/LS_root/mounts/clusters/garbage-project/code/Users/s210603/Garbage_Classification",
+    "host": "garbage-project",
+    "username": "azureuser",
+    "executable": "/anaconda/envs/azureml_py38/bin/python"
+}
