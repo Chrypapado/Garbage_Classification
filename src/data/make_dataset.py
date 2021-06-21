@@ -2,11 +2,11 @@ import logging
 import os
 import re
 import shutil
+import kaggle
 import zipfile
 from pathlib import Path
 
 import cv2
-import kaggle
 import kornia
 import matplotlib.pyplot as plt
 import numpy as np
