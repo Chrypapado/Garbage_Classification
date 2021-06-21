@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import shutil
-import kaggle
+
 import zipfile
 from pathlib import Path
 
@@ -16,7 +16,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 from torch import nn
 from torchvision.datasets import ImageFolder
-
+import kaggle
 
 def main():
     """ Runs data processing scripts to turn raw data from (../raw) into
