@@ -2,9 +2,9 @@ name: "Run tests"
 
 on:
   push:
-    branches: [ wandb-ci ]
+    branches: [ test ]
   pull_request:
-    branches: [ wandb-ci ]
+    branches: [ test ]
 
 jobs:
   build:
