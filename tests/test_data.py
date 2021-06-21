@@ -15,7 +15,7 @@ def test_data():
     Checks that data gets loaded correctly
     '''
     trainset, testset, valset = dataset()
-    assert len(trainset) == 4079
+    assert len(trainset) == 7072
     assert len(testset) == 431
     assert len(valset) == 328
     trainset = torch.utils.data.DataLoader(
