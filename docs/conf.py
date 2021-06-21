@@ -2,7 +2,7 @@
 extensions = []
 # Garbage_Classification documentation build configuration file, created by
 # sphinx-quickstart.
-#
+# test
 # This file is execfile()d with the current directory set to its containing dir.
 #
 # Note that not all possible configuration values are present in this
