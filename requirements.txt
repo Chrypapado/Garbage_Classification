@@ -1,5 +1,4 @@
 pytest==6.2.4
-kaggle==1.5.12
 seaborn==0.11.1
 opencv_python==4.5.2.54
 torchvision==0.9.1
@@ -10,3 +9,4 @@ numpy==1.18.5
 torch==1.8.1
 Pillow==8.2.0
 scikit_learn==0.24.2
+kaggle==1.5.12
