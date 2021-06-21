@@ -2,9 +2,9 @@ name: "Linting and Flaking"
 
 on:
   push:
-    branches: [ master ]
+    branches: [ wandb-ci ]
   pull_request:
-    branches: [ master ]
+    branches: [ wandb-ci ]
 
 jobs:
   build:
@@ -22,7 +22,6 @@ jobs:
       run: |
         pip install isort
         isort .
-
     - name: Lint with flake8
       run: |
         pip install flake8
