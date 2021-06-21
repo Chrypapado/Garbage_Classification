@@ -1,4 +1,6 @@
 import sys
+import os
+import shutil
 from pathlib import Path
 
 import pytest
@@ -14,6 +16,8 @@ def test_data():
     '''
     Checks that data gets loaded correctly
     '''
+    os.makedirs('/home/runner/.kaggle', exist_ok=True)
+    shutil.copy(str(project_dir) + '/.kaggle/kaggle.json', '/home/runner/.kaggle')
     trainset, testset, valset = dataset()
     assert len(trainset) == 7072
     assert len(testset) == 431
