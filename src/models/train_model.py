@@ -6,7 +6,10 @@ import wandb
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
+import torchvision.transforms as transforms
 from model import ResNet
+from torchvision.datasets import ImageFolder
+import optuna
 
 project_dir = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_dir / 'src/data'))
@@ -136,6 +139,77 @@ class TrainOREvaluate(object):
             accuracy = test_accuracy.item() / (counter + 1)
             print('Test accuracy: {:.2f}%'.format(accuracy * 100))
 
+
+    def objective(trial):
+        project_dir = str(Path(__file__).resolve().parents[2])
+        processed_dir = project_dir + '/data/processed'
+        train_dir = processed_dir + '/Train'
+        test_dir = processed_dir + '/Test'
+        val_dir = processed_dir + '/Validation'
+
+        lr = trial.suggest_discrete_uniform('lr', 1e-6, 1e-0, 1e-6)
+        batch_size = trial.suggest_discrete_uniform('batch_size', 10, 100, 10)
+        #batch_normalize = trial.suggest_categorical('batch_normalize', ['True', 'False'])
+        activation_function = trial.suggest_categorical('activations', [nn.ReLU, nn.Tanh, nn.RReLU, nn.LeakyReLU, nn.ELU])
+
+        #if batch_normalize == False:
+        transformations = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
+        train_set = ImageFolder(train_dir, transform=transformations)
+        test_set = ImageFolder(test_dir, transform=transformations)
+        val_set = ImageFolder(val_dir, transform=transformations)
+        # else:
+        #     transformations = transforms.Normalize([transforms.Resize((256, 256)), transforms.ToTensor()])
+        #     train_set = ImageFolder(train_dir, transform=transformations)
+        #     test_set = ImageFolder(test_dir, transform=transformations)
+        #     val_set = ImageFolder(val_dir, transform=transformations)
+
+        # DATALOADERS
+        train_dl = DataLoader(train_set, batch_size, shuffle=True, num_workers=4, pin_memory=True)
+        val_dl = DataLoader(val_set, batch_size * 2, shuffle=True, num_workers=4, pin_memory=True)
+
+        model = ResNet()
+        model.to(device)
+
+        criterion = nn.CrossEntropyLoss()
+
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        epochs = 10
+        for epoch in range(epochs):
+
+            train_accuracy = 0
+            model.train()
+
+            for (counter, (images, labels)) in enumerate(train_dl):
+                images, labels = images.to(device), labels.to(device)
+                output = model(images)
+                _, predictions = torch.max(output, dim=1)
+                loss = criterion(output, labels)
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+                train_acc = torch.tensor(torch.sum(predictions == labels).item() / len(predictions))
+                train_accuracy += train_acc
+            epoch_train_acc = train_accuracy.item() / (counter + 1)
+
+            with torch.no_grad():
+                val_accuracy = 0
+                # class_acc = {}
+                # correct_pred_list = [0 for _ in range(6)]
+                # total_pred_list = [0 for _ in range(6)]
+                model.eval()
+                for (counter, (images, labels)) in enumerate(val_dl):
+                    images, labels = images.to(device), labels.to(device)
+                    outputs = model(images)
+                    _, predictions = torch.max(outputs, dim=1)
+                    val_acc = torch.tensor(torch.sum(predictions == labels).item() / len(predictions))
+                    val_accuracy += val_acc
+
+                epoch_val_acc = val_accuracy.item() / (counter + 1)
+
+        return epoch_train_acc, epoch_val_acc
+
+    # study = optuna.create_study()
+    # study.optimize(objective, n_trials=3)
 
 if __name__ == '__main__':
     TrainOREvaluate()

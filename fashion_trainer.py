@@ -6,6 +6,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torchvision.datasets import FashionMNIST
+import optuna
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -143,9 +144,52 @@ def train_and_test():
 				label = labels[i]
 				class_correct[label] += c[i].item()
 				total_correct[label] += 1
+	return class_correct, total_correct
 
 	for i in range(10):
 		print("Accuracy of {}: {:.2f}%".format(output_label(i), class_correct[i] * 100 / total_correct[i]))
+
+def objective(trial):
+
+	lr = trial.suggest_discrete_uniform('lr', 1e-6, 1e-0)
+	batch_size = trial.suggest_discrete_uniform('batch_size', 10, 100)
+	batch_normalize = trial.suggest_categorical('batch_normalize', ['True', 'False'])
+	activation_function = trial.suggest_categorical('activations', [nn.ReLU, nn.Tanh, nn.RReLU, nn.LeakyReLU, nn.ELU])
+
+	if activation_function == False:
+		train_set = FashionMNIST('', train=True, download=True, transform=transforms.Compose([transforms.ToTensor()]))
+		test_set = FashionMNIST('', train=False, download=True, transform=transforms.Compose([transforms.ToTensor()]))
+		val_set = FashionMNIST('', train=False, download=True, transform=transforms.Compose([transforms.ToTensor()]))
+	else:
+		train_set = FashionMNIST('', train=True, download=True, transform=transforms.Normalize([transforms.ToTensor()]))
+		test_set = FashionMNIST('', train=False, download=True, transform=transforms.Normalize([transforms.ToTensor()]))
+		val_set = FashionMNIST('', train=False, download=True, transform=transforms.Normalize([transforms.ToTensor()]))
+
+	train_loader = DataLoader(train_set, batch_size=batch_size)
+	test_loader = DataLoader(test_set, batch_size=batch_size)
+
+	validation_split = 0.05
+	dataset_size = len(train_set)
+	indices = list(range(dataset_size))
+
+	train_indices, val_indices = indices[split:], indices[:split]
+
+	val_sampler = SubsetRandomSampler(val_indices)
+	validation_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
+                                                sampler=valid_sampler)
+
+	model = FashionCNN()
+	model.to(device)
+
+	error = nn.CrossEntropyLoss()
+
+	optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+	accuracy_list = []
+
+	for e in range(epochs):
+    	 = train_and_test()
+
+    return
 
 if __name__ == "__main__":
 	train_and_test()
