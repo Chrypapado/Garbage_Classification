@@ -76,8 +76,8 @@ target/
 .ipynb_checkpoints/
 
 # exclude data from source control by default
-/data/processed/
-/data/raw/
+# /data/processed/
+# /data/raw/
 
 /models/model1.pth
 /models/model2.pth

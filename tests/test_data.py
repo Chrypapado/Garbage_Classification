@@ -15,13 +15,12 @@ def test_data():
     Checks that data gets loaded correctly
     '''
     trainset, testset, valset = dataset()
-    assert len(trainset) == 4079
+    assert len(trainset) == 7072
     assert len(testset) == 431
     assert len(valset) == 328
     trainset = torch.utils.data.DataLoader(
         trainset, batch_size=64, shuffle=True)
     image, label = next(iter(trainset))
-    # image[0].shapge gives me an error I do not know why
     assert image[0].shape == torch.Size([3, 256, 256])
     # make sure that all labels are represented
     label_list = label.tolist()

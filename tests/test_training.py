@@ -16,7 +16,7 @@ def test_training():
     and that the trained model has been saved.
     '''
     report_path = str(project_dir / 'reports/figures/tSNE.png')
-    model_path = project_dir.joinpath('models/model1.pth')
+    model_path = project_dir.joinpath('models/model0.pth')
 
     assert os.path.isfile(report_path)
     assert os.path.isfile(model_path)

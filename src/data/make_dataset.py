@@ -2,11 +2,11 @@ import logging
 import os
 import re
 import shutil
+
 import zipfile
 from pathlib import Path
 
 import cv2
-import kaggle
 import kornia
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,6 +16,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 from torch import nn
 from torchvision.datasets import ImageFolder
+# import kaggle
 
 
 def main():
@@ -34,8 +35,8 @@ def main():
         pass
     else:
         # Download Data
-        kaggle.api.authenticate()
-        kaggle.api.dataset_download_files('asdasdasasdas/garbage-classification', path=project_dir + '/data/raw/')
+        # kaggle.api.authenticate()
+        # kaggle.api.dataset_download_files('asdasdasasdas/garbage-classification', path=project_dir + '/data/raw/')
 
         # Unzip Files
         with zipfile.ZipFile(project_dir + '/data/raw/garbage-classification.zip', "r") as zip_ref:
