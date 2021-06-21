@@ -18,6 +18,7 @@ from torch import nn
 from torchvision.datasets import ImageFolder
 # import kaggle
 
+
 def main():
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
