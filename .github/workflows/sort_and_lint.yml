@@ -2,9 +2,9 @@ name: "Linting and Flaking"
 
 on:
   push:
-    branches: [ wandb-ci ]
+    branches: [ master ]
   pull_request:
-    branches: [ wandb-ci ]
+    branches: [ master ]
 
 jobs:
   build:
