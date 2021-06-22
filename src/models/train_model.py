@@ -42,9 +42,14 @@ def objective(trial):
     # DATALOADERS
     train_dl = DataLoader(train_set, batch_size, shuffle=True, num_workers=4, pin_memory=True)
     val_dl = DataLoader(val_set, batch_size * 2, shuffle=True, num_workers=4, pin_memory=True)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
+
     model = ResNet()
     model.to(device)
+    print(device)
 
     criterion = nn.CrossEntropyLoss()
 
@@ -82,7 +87,7 @@ def objective(trial):
 
             epoch_val_acc = val_accuracy.item() / (counter + 1)
 
-    return epoch_train_acc, epoch_val_acc
+    return epoch_val_acc
 
 
 
@@ -215,6 +220,17 @@ class TrainOREvaluate(object):
 
 
 if __name__ == '__main__':
-    study = optuna.create_study()
-    study.optimize(objective, n_trials=3)
+    sampler = optuna.samplers.TPESampler(seed=10)
+    study = optuna.create_study(
+    direction="maximize", sampler=sampler,
+    pruner=optuna.pruners.MedianPruner(
+        n_startup_trials=5, n_warmup_steps=30, interval_steps=10
+    ),
+)
+    study.optimize(objective, n_trials=10)
+    fig = optuna.visualization.plot_optimization_history(study)
+    fig.show()
+
+    fig = optuna.visualization.plot_intermediate_values(study)
+    fig.show()
     # TrainOREvaluate()
