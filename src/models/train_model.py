@@ -75,8 +75,8 @@ class TrainOREvaluate(object):
             with torch.no_grad():
                 val_accuracy = 0
                 class_acc = {}
-                correct_pred_list = [0 for _ in range(6)]
-                total_pred_list = [0 for _ in range(6)]
+                correct_pred_list = [0 for _ in range(len(classes))]
+                total_pred_list = [0 for _ in range(len(classes))]
                 model.eval()
                 for (counter, (images, labels)) in enumerate(val_dl):
                     images, labels = images.to(device), labels.to(device)
