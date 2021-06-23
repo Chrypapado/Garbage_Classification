@@ -51,7 +51,7 @@ class TrainOREvaluate(object):
         val_dl = DataLoader(val_set, args.batch_size * 2, shuffle=True, num_workers=args.num_workers, pin_memory=True)
         # Initialize wandb
         wandb.login()
-        wandb.init(project='testing', config=args, dir=str(project_dir.joinpath('./reports')))
+        wandb.init(project='Garbage_Project', config=args, dir=str(project_dir.joinpath('./reports')))
         wandb.watch(model, log_freq=100)
         for epoch in range(args.num_epochs):
             # Training
