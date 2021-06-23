@@ -47,7 +47,8 @@ Project Organization
     │
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
     │                         generated with `pip freeze > requirements.txt`
-    ├── tests
+    │ 
+    ├── tests              <- Tests for continuous integration
     │   ├── __init__.py    <- Makes src a Python module
     │   └── test_data.py               
     │   └── test_model.py
