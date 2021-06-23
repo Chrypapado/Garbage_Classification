@@ -34,6 +34,7 @@ class TrainOREvaluate(object):
         parser.add_argument('--lr', default=5.5e-5)
         parser.add_argument('--batch_size', default=32)
         parser.add_argument('--num_epochs', type=int, default=10)
+        parser.add_argument('--num_workers', type=int, default=4)
         args = parser.parse_args(sys.argv[2:])
         print(args)
         # Load Data
@@ -46,8 +47,8 @@ class TrainOREvaluate(object):
         model.to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-        train_dl = DataLoader(train_set, args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
-        val_dl = DataLoader(val_set, args.batch_size * 2, shuffle=True, num_workers=4, pin_memory=True)
+        train_dl = DataLoader(train_set, args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
+        val_dl = DataLoader(val_set, args.batch_size * 2, shuffle=True, num_workers=args.num_workers, pin_memory=True)
         # Initialize wandb
         wandb.login()
         wandb.init(project='testing', config=args, dir=str(project_dir.joinpath('./reports')))
@@ -75,8 +76,8 @@ class TrainOREvaluate(object):
             with torch.no_grad():
                 val_accuracy = 0
                 class_acc = {}
-                correct_pred_list = [0 for _ in range(6)]
-                total_pred_list = [0 for _ in range(6)]
+                correct_pred_list = [0 for _ in range(len(classes))]
+                total_pred_list = [0 for _ in range(len(classes))]
                 model.eval()
                 for (counter, (images, labels)) in enumerate(val_dl):
                     images, labels = images.to(device), labels.to(device)
