@@ -2,6 +2,22 @@ Garbage Classification
 ==============================
 
 The final project for DTU's Special Course: Machine Learning Operations
+The objective of our project was to implement a classifier capable of distinquishing the different types of garbage.
+Our dataset was downloaded from [kaggle](https://www.kaggle.com/asdasdasasdas/garbage-classification). 
+The initial dataset was consist of 6 types of garbage. More precisely: Cardboad, Glass, Metal, Paper, Plastic and Trash.
+
+We also took advantage of the [Kornia](https://github.com/kornia/kornia) framework and performed data augmentantion to the above mentioned dataset.
+Overall, 5304 new images were generated and used for training purposes.
+
+
+Usage
+==============================
+1. Install all the required packages: `pip install -r requirement.txt`
+2. In order to download the dataset: `python src/data/make_dataset.py`
+3. Once you have the dataset, initialize the training: `python src/models/train.py`
+4. After training, evaluate the model: `python src/models/evaluate.py`
+5. If you only want to classify a single image, first, place your desired image in the following folder: `data/external` and then simply `python src/models/predict_model.py [--load_model_from] <image_name>`
+
 
 Project Organization
 ------------
@@ -27,9 +43,16 @@ Project Organization
     │
     ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
     │   └── figures        <- Generated graphics and figures to be used in reporting
+    │   └── wandb          <- Generated wandb logs
     │
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
     │                         generated with `pip freeze > requirements.txt`
+    │ 
+    ├── tests              <- Tests for continuous integration
+    │   ├── __init__.py    <- Makes src a Python module
+    │   └── test_data.py               
+    │   └── test_model.py
+    │   └── test_training.py
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
     ├── src                <- Source code for use in this project.
@@ -37,6 +60,7 @@ Project Organization
     │   │
     │   ├── data           <- Scripts to download or generate data
     │   │   └── make_dataset.py
+    │   │   └── distributed_data_loading.py
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
@@ -44,7 +68,10 @@ Project Organization
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
     │   │   ├── predict_model.py
-    │   │   └── train_model.py
+    │   │   └── train.py
+    │   │   └── evaluate.py
+    │   │   └── model.py
+    │   │   └── train_optuna.py
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
